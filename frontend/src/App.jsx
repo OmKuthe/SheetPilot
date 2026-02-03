@@ -20,18 +20,30 @@ export default function App() {
     setRows(res.data.rows);
     setLoading(false);
   };
-
+  const downloadExcel = () => {
+    window.open("http://localhost:5000/export", "_blank");
+  };
+  
   const runQuery = async () => {
     if (!query) return;
-
-    setLoading(true);
-    const res = await axios.post("http://localhost:5000/smart-query", {
-      message: query,
-      columns
-    });
-    setRows(res.data.result.rows);
-    setLoading(false);
+  
+    try {
+      setLoading(true);
+  
+      const res = await axios.post("http://localhost:5000/smart-query", {
+        message: query,
+        columns
+      });
+  
+      setRows(res.data.result.rows);
+    } catch (err) {
+      alert("Query failed. Check backend.");
+      console.error(err);
+    } finally {
+      setLoading(false);   // ALWAYS turn it off
+    }
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -67,6 +79,9 @@ export default function App() {
           Run
         </button>
       </div>
+      <button onClick={downloadExcel} className="bg-purple-600 text-white px-6 py-2 rounded ml-4">
+      Download Excel</button>
+
 
       {loading && <p className="text-center">Processing...</p>}
 

@@ -95,7 +95,7 @@ app.post("/smart-query", express.json(), async (req, res) => {
     try {
         const { message, columns } = req.body;
 
-        // 1. Ask SheetPilot's brain
+        // 1. Ask SheetPilot's brain - FIX THIS LINE
         const ai = await axios.post("http://localhost:5000/local-ai", {
             message,
             columns
@@ -112,6 +112,20 @@ app.post("/smart-query", express.json(), async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Smart query failed" });
+    }
+});
+
+app.get("/export", async (req, res) => {
+    try {
+        const response = await axios.get("http://127.0.0.1:8000/export", {
+            responseType: "stream"
+        });
+
+        res.setHeader("Content-Disposition", "attachment; filename=sheetpilot.xlsx");
+        response.data.pipe(res);
+
+    } catch (err) {
+        res.status(500).json({ error: "Export failed" });
     }
 });
 
